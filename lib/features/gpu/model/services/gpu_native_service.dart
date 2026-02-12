@@ -740,16 +740,19 @@ class GpuNativeService {
           String deviceType = 'GPU';
           if (vendorId.toLowerCase().contains('8086')) {
             deviceType = 'GPU (Intel Integrated)';
-            if (vendorName == 'Unknown Vendor')
+            if (vendorName == 'Unknown Vendor') {
               vendorName = 'Intel Corporation';
+            }
           } else if (vendorId.toLowerCase().contains('10de')) {
             deviceType = 'GPU (NVIDIA)';
-            if (vendorName == 'Unknown Vendor')
+            if (vendorName == 'Unknown Vendor') {
               vendorName = 'NVIDIA Corporation';
+            }
           } else if (vendorId.toLowerCase().contains('1002')) {
             deviceType = 'GPU (AMD)';
-            if (vendorName == 'Unknown Vendor')
+            if (vendorName == 'Unknown Vendor') {
               vendorName = 'Advanced Micro Devices';
+            }
           }
 
           // Try to read memory info if available

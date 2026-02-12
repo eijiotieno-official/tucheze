@@ -7,13 +7,16 @@ environment:
   sdk: ^3.10.8
 
 dependencies:
+  archive: ^4.0.7
   dartz: ^0.10.1
   ffi: ^2.2.0
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.2
   flutter_riverpod: ^3.2.1
+  http: ^1.6.0
   logger: ^2.6.2
+  path_provider: ^2.1.5
   shared_preferences: ^2.5.4
   shimmer: ^3.0.0
 
