@@ -143,8 +143,21 @@ class RunnerService {
         return Left('Runner already downloaded');
       }
 
-      // Download file
-      final downloadPath = '${dir.path}/${runner.name}.tar.gz';
+      // Determine file extension from download URL
+      final url = runner.downloadUrl;
+      String extension = '.tar.gz';
+      if (url.endsWith('.tar.xz')) {
+        extension = '.tar.xz';
+      } else if (url.endsWith('.tar.gz')) {
+        extension = '.tar.gz';
+      } else if (url.contains('.tar.xz')) {
+        extension = '.tar.xz';
+      }
+
+      _logger.d('Detected archive extension: $extension from URL: $url');
+
+      // Download file with correct extension
+      final downloadPath = '${dir.path}/${runner.name}$extension';
       final downloadResult = await _downloadFile(
         runner.downloadUrl,
         downloadPath,
@@ -224,7 +237,7 @@ class RunnerService {
     }
   }
 
-  /// Extract tar.gz archive
+  /// Extract tar.gz or tar.xz archive
   Future<Either<String, void>> _extractArchive(
     String archivePath,
     String extractPath,
@@ -232,32 +245,46 @@ class RunnerService {
     try {
       _logger.d('Extracting: $archivePath to $extractPath');
 
-      // Read the archive
-      final bytes = File(archivePath).readAsBytesSync();
+      // Determine compression type from file extension
+      final isTarXz = archivePath.endsWith('.tar.xz');
+      final isTarGz = archivePath.endsWith('.tar.gz');
 
-      // Decode the archive
-      Archive archive;
-      if (archivePath.endsWith('.tar.gz')) {
-        archive = TarDecoder().decodeBytes(GZipDecoder().decodeBytes(bytes));
-      } else if (archivePath.endsWith('.tar.xz')) {
-        archive = TarDecoder().decodeBytes(XZDecoder().decodeBytes(bytes));
-      } else {
-        return Left('Unsupported archive format');
+      if (!isTarXz && !isTarGz) {
+        return Left('Unsupported archive format: $archivePath');
       }
 
+      _logger.d(
+        'Archive format: ${isTarXz ? 'tar.xz (XZ compression)' : 'tar.gz (GZip compression)'}',
+      );
+
+      // Read archive file into bytes
+      final bytes = File(archivePath).readAsBytesSync();
+
+      // Decompress based on format
+      final decompressedBytes = isTarXz
+          ? XZDecoder().decodeBytes(bytes)
+          : GZipDecoder().decodeBytes(bytes);
+
+      // Decode tar archive
+      final archive = TarDecoder().decodeBytes(decompressedBytes);
+
+      _logger.d('Archive contains ${archive.length} files/directories');
+
       // Extract files
+      int filesExtracted = 0;
       for (final file in archive) {
         final filename = '$extractPath/${file.name}';
         if (file.isFile) {
           final outFile = File(filename);
           await outFile.create(recursive: true);
           await outFile.writeAsBytes(file.content as List<int>);
+          filesExtracted++;
         } else {
           await Directory(filename).create(recursive: true);
         }
       }
 
-      _logger.d('Extraction complete');
+      _logger.d('Extraction complete: $filesExtracted files extracted');
       return const Right(null);
     } catch (e, stackTrace) {
       _logger.e('Extraction error', error: e, stackTrace: stackTrace);

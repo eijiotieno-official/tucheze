@@ -16,8 +16,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     ref.watch(gpusProvider);
-    return Material(
-      child: Center(
+    return Scaffold(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 16.0,
