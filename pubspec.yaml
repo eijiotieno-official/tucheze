@@ -1,12 +1,13 @@
 name: tucheze
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
   sdk: ^3.10.8
 
 dependencies:
+  adwaita_gtk: ^1.2.0
   archive: ^4.0.7
   dartz: ^0.10.1
   ffi: ^2.2.0
@@ -15,10 +16,13 @@ dependencies:
   flutter_animate: ^4.5.2
   flutter_riverpod: ^3.2.1
   http: ^1.6.0
+  libadwaita: ^2.0.2
+  libadwaita_window_manager: ^0.5.4+1
   logger: ^2.6.2
   path_provider: ^2.1.5
   shared_preferences: ^2.5.4
   shimmer: ^3.0.0
+  window_manager: ^0.5.1
 
 dev_dependencies:
   flutter_lints: ^6.0.0
